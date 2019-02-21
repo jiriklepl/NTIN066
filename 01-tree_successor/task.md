@@ -6,3 +6,5 @@ and it should return another node of the tree with the next higher key
 - If there is no such node, it should return a null pointer.
 - The given node can also be a null pointer, in which case the method should
   return the smallest node in the tree.
+
+You should submit the file `tree_successor.h`.
