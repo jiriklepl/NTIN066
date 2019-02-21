@@ -1,7 +1,7 @@
 test: tree_successor_test
 	./$<
 
-CXXFLAGS=-O2 -Wall -Wextra -g -Wno-sign-compare
+CXXFLAGS=-std=gnu++11 -O2 -Wall -Wextra -g -Wno-sign-compare
 
 tree_successor_test: tree_successor.h tree_successor_test.cpp test_main.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
