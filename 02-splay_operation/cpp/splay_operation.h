@@ -126,6 +126,7 @@ class Tree {
             }
             if (replacement)
                 replacement->parent = node->parent;
+            delete node;
         }
     }
 
