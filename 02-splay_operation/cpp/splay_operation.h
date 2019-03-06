@@ -30,7 +30,7 @@ class Tree {
     // Rotate the given `node` up. Perform a single rotation of the edge
     // between the node and its parent, choosing left or right rotation
     // appropriately.
-    void rotate(Node* node) {
+    virtual void rotate(Node* node) {
         if (node->parent) {
             if (node->parent->left == node) {
                 if (node->right) node->right->parent = node->parent;
@@ -133,7 +133,7 @@ class Tree {
     // Splay the given node.
     // If a single rotation needs to be performed, perform it as the last rotation
     // (i.e., to move the splayed node to the root of the tree).
-    void splay(Node* node) {
+    virtual void splay(Node* node) {
         // TODO: Implement
     }
 
