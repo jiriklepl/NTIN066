@@ -20,27 +20,6 @@ def generic_test(N, M, B, max_ratio, debug_level):
 
     m.check_result()
 
-def test_main(a, b, limit, num_items):
-    tree = ABTree(a, b)
-
-    # Insert keys
-    step = int(limit * 1.618)
-    key, audit_time = 1, 1
-    for i in range(num_items):
-        tree.insert(key)
-        key = (key + step) % limit
-
-        # Audit the tree occasionally
-        if i == audit_time or i + 1 == num_items:
-            audit(tree)
-            audit_time = int(audit_time * 1.33) + 1
-
-    # Check the content of the tree
-    key = 1
-    for i in range(limit):
-        assert tree.find(key) == (i < num_items), "Tree contains wrong keys"
-        key = (key + step) % limit
-
 # A list of all tests
 tests = [
     # name                                  N      M     B  max_ratio  debug_level
