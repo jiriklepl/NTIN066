@@ -46,8 +46,7 @@ class CuckooTable:
         b0 = self.hashes[0].hash(key)
         b1 = self.hashes[1].hash(key)
         # print("## Lookup key={} b0={} b1={}".format(key, b0, b1))
-        return (self.table[b0] is not None and self.table[b0] == key) or \
-               (self.table[b1] is not None and self.table[b1] == key)
+        return self.table[b0] == key or self.table[b1] == key
 
     def insert(self, key):
         """Insert a new key to the table. Assumes that the key is not present yet."""
