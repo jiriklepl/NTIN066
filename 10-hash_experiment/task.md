@@ -9,7 +9,7 @@ needed to perform the following experiments:
 - _Grow test:_ This test tries different sizes $N$ of the hash table and for each size
   it inserts small keys in random order until 60% of the table is used
   and then it performs lookup operation for keys $0,\ldots,N-1$.
-- _Usage test:_ This test uses hash table of size $2^20$. It performs insertions
+- _Usage test:_ This test uses hash table of size $2^{20}$. It performs insertions
   to increase usage of the table by 1%, reports efficiency of the insert operation,
   and repeats until usage of the table reaches 90%.
 
