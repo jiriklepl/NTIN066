@@ -143,7 +143,7 @@ def usage_test(hash_fun_factory, max_usage = 90, retry = 40):
     avg = [0.0] * max_usage
     avg2 = [0.0] * max_usage
 
-    N = 2**20
+    N = 2**19
     step_size = N // 100
     elements = list(range(N))
 
@@ -165,7 +165,7 @@ def usage_test(hash_fun_factory, max_usage = 90, retry = 40):
 
         print("%i %.03f %.03f" % ((i + 1), avg[i], std_dev))
 
-def grow_test(hash_fun_factory, usage = 60, retry = 40, begin = 7, end = 22):
+def grow_test(hash_fun_factory, usage = 60, retry = 40, begin = 7, end = 21):
     for n in range(begin, end):
         avg = 0.0
         avg2 = 0.0
