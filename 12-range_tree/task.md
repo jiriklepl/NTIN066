@@ -1,14 +1,14 @@
-You are given an implementation of a splay tree which associates every numeric
-key with a numeric value. The splay tree provides `lookup`, `insert`, and `remove`
+You are given an implementation of a Splay tree which associates every numeric
+key with a numeric value. The Splay tree provides `lookup`, `insert`, and `remove`
 operations.
 
-Your goal is to modify the splay tree to support range queries in amortized
-logarithmic time. The operation you need to implement takes an range on the
-input and should return the sum of values of the elements in the given range.
+Your goal is to modify the Splay tree to support range queries in amortized
+logarithmic time. The operation you need to implement takes a range of the
+keys and it should return the sum of values of the elements in the given range.
 
 As usual, you should submit only the `range_tree.{h,py}` file.
 
-## Optional: Range updates (for 5 points)
+## Optional: Range updates (for extra 5 points)
 
 If you also implement an operation
 ```
