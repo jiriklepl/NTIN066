@@ -121,7 +121,7 @@ class Tree:
                 right.parent = self.root
 
     def range_sum(self, left, right):
-        """Return number of elements in range [left, right]
+        """Return the sum of elements with keys in range [left, right]
 
         Given a closed range [left, right], return the sum of values of elements
         in the range, i.e., sum(value | (key, value) in tree, left <= key <= right).
