@@ -35,6 +35,8 @@ experiments to gain better understanding of the data structure and include these
 in the report. This is strictly optional.)
 
 You should submit a PDF file with the report (and no source code).
+You will get 1 temporary point upon submission if the file is syntantically correct;
+proper points will be assigned later.
 
 ## Test program
 
