@@ -54,11 +54,10 @@ The output of the program contains one line per experiment, which consists of:
 
 ## Your implementation
 
-Please use your implementation from the previous exercise. If you used C++,
-you should declare the `splay()` and `rotate()` methods as virtual (they will
-be overriden by the test program). Also, if you are performing a double rotation
-directly instead of composing it from single rotations, you need to adjust
-the `BenchmarkingTree` class accordingly.
+Please use your implementation from the previous exercise. Methods `splay()`
+and `rotate()` will be augmented by the test program. If you are performing
+a double rotation directly instead of composing it from single rotations, you
+need to adjust the `BenchmarkingTree` class accordingly.
 
 ## Hints
 
