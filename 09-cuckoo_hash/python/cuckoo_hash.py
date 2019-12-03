@@ -31,7 +31,8 @@ class CuckooTable:
     """
 
     def __init__(self, num_buckets):
-        """Initialize the table with the given number of buckets."""
+        """Initialize the table with the given number of buckets.
+        The number of buckets is expected to stay constant."""
 
         # The array of buckets
         self.num_buckets = num_buckets

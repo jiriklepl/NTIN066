@@ -66,6 +66,7 @@ public:
     CuckooTable(unsigned num_buckets)
     {
         // Initialize the table with the given number of buckets.
+	// The number of buckets is expected to stay constant.
 
         this->num_buckets = num_buckets;
         table.resize(num_buckets, UNUSED);
