@@ -14,7 +14,7 @@ needed to perform the following experiments:
   and repeats until usage of the table reaches 90%.
 
 Both experiments measure number of probed buckets per operation, are repeated 40 times
-and report average and standard deviation. Note that even with 40 repetitions
+and report both the average and the standard deviation. Note that even with 40 repetitions
 the reported numbers still depend quite a lot on the random seed used.
 
 You should perform these experiments for 5 different classes of hash functions –
