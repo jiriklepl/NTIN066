@@ -97,7 +97,7 @@ class Tree {
     }
 
     // Delete given key from the tree.
-    // It the key is not present, do nothing.
+    // It the key is not present, nothing happens.
     void remove(int key) {
         // TODO: Utilize splay suitably.
         Node* node = root;

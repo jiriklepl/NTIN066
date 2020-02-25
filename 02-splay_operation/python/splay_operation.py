@@ -60,7 +60,7 @@ class Tree:
     def insert(self, key):
         """Insert key into the tree.
 
-        If the key is already present, do nothing.
+        If the key is already present, nothing happens.
         """
         # TODO: Utilize splay suitably.
         if self.root is None:
@@ -81,7 +81,7 @@ class Tree:
     def remove(self, key):
         """Remove given key from the tree.
 
-        It the key is not present, do nothing.
+        It the key is not present, nothing happens.
         """
         # TODO: Utilize splay suitably.
         node = self.root
