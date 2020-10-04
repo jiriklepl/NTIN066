@@ -49,7 +49,24 @@ class Tree {
     // Return nullptr if there is no such node.
     // If the argument is nullptr, return the node with the smallest key.
     Node* successor(Node* node) {
-        // TODO: Implement
+        Node* tmp = (node) ? node->right : root;
+
+        if (tmp) {
+            while ((node = tmp->left)) {
+                if (!(tmp = node->left)) {
+                    return node;
+                }
+            }
+
+            return tmp;
+        } else {
+            do {
+                tmp = node;
+                node = node->parent;
+            } while (node && tmp == node->right);
+
+            return node;
+        }
     }
 
     // Destructor to free all allocated memory.
