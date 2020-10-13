@@ -1,3 +1,5 @@
+#include <utility>
+
 // A node of the tree
 class Node {
   public:
@@ -59,10 +61,12 @@ class Tree {
     // Look up the given key in the tree, returning the
     // the node with the requested key or nullptr.
     Node* lookup(int key) {
-        // TODO: Utilize splay suitably.
-        Node* node = root;
+        Node* node = root, *splayed = nullptr;
         while (node) {
+            splayed = node;
+
             if (node->key == key) {
+                splay(node);
                 return node;
             }
             if (key < node->key)
@@ -70,13 +74,15 @@ class Tree {
             else
                 node = node->right;
         }
+
+        if (splayed)
+            splay(splayed);
         return nullptr;
     }
 
     // Insert a key into the tree.
     // If the key is already present, nothing happens.
     void insert(int key) {
-        // TODO: Utilize splay suitably.
         if (!root) {
             root = new Node(key);
             return;
@@ -94,14 +100,15 @@ class Tree {
                 node = node->right;
             }
         }
+
+        splay(node);
     }
 
     // Delete given key from the tree.
     // It the key is not present, nothing happens.
     void remove(int key) {
-        // TODO: Utilize splay suitably.
-        Node* node = root;
-        while (node && node->key != key) {
+        Node* node = root, *splayed = nullptr;
+        while (node && (splayed = node)->key != key) {
             if (key < node->key)
                 node = node->left;
             else
@@ -119,22 +126,75 @@ class Tree {
 
             Node* replacement = node->left ? node->left : node->right;
             if (node->parent) {
-                if (node->parent->left == node) node->parent->left = replacement;
-                else node->parent->right = replacement;
+                if (node->parent->left == node)
+                    node->parent->left = replacement;
+                else
+                    node->parent->right = replacement;
             } else {
                 root = replacement;
             }
-            if (replacement)
+
+            if (replacement) {
+                splayed = replacement;
                 replacement->parent = node->parent;
+            } else {
+                splayed = node->parent;
+            }
+
             delete node;
         }
+
+        if (splayed)
+            splay(splayed);
     }
 
     // Splay the given node.
     // If a single rotation needs to be performed, perform it as the last rotation
     // (i.e., to move the splayed node to the root of the tree).
     virtual void splay(Node* node) {
-        // TODO: Implement
+        Node* tmp = node;
+        Node* tmp2 = node->parent;
+        Node* tmp3 = tmp2 ? tmp2->parent : nullptr;
+        Node* Node::* prim = &Node::right;
+        Node* Node::* sec = &Node::left;
+
+        while (tmp2) {
+            if (tmp == tmp2->*prim) {
+                std::swap(prim, sec);
+                tmp = node;
+            }
+
+            if ((tmp2->*sec = tmp->*prim))
+                (tmp->*prim)->parent = tmp2;
+            
+            tmp->*prim = tmp2;
+            tmp2->parent = tmp;
+
+            if (!tmp3 || tmp3 == node) {
+                if (!tmp3)
+                    node->parent = nullptr;
+
+                tmp = node;
+                tmp2 = node->parent;
+                tmp3 = tmp2 ? tmp2->parent : nullptr;
+                prim = &Node::right;
+                sec = &Node::left;
+            } else {
+                if ((node->parent = tmp3->parent)) {
+                    if (node->parent->left == tmp3)
+                        node->parent->left = node;
+                    else
+                        node->parent->right = node;
+                }
+
+                tmp = tmp2;
+                tmp2 = tmp3;
+                tmp3 = node;
+            }
+        }
+
+        root = node;
+        node->parent = nullptr;
     }
 
     // Destructor to free all allocated memory.
