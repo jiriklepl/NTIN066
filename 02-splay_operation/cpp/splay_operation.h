@@ -152,34 +152,48 @@ class Tree {
     // If a single rotation needs to be performed, perform it as the last rotation
     // (i.e., to move the splayed node to the root of the tree).
     virtual void splay(Node* node) {
-        Node* tmp = node;
-        Node* tmp2 = node->parent;
-        Node* tmp3 = tmp2 ? tmp2->parent : nullptr;
-        Node* Node::* prim = &Node::right;
-        Node* Node::* sec = &Node::left;
+        Node* tmp;
+        Node* tmp2;
+        Node* tmp3;
+        Node* Node::* prim;
+        Node* Node::* sec;
+
+        tmp = node;
+        tmp2 = node->parent;
+        tmp3 = tmp2 ? tmp2->parent : nullptr;
+        prim = &Node::right;
+        sec = &Node::left;
 
         while (tmp2) {
+            // if tmp is tmp2's primary son
+            // we switch to the other instance of the half of the double rotation
+            // by swapping the meanings of primary/secondary and setting tmp to node
             if (tmp == tmp2->*prim) {
                 std::swap(prim, sec);
                 tmp = node;
             }
 
+            // half of the double rotation
+            // (alternates between bottom and top - in this order)
             if ((tmp2->*sec = tmp->*prim))
                 (tmp->*prim)->parent = tmp2;
             
             tmp->*prim = tmp2;
             tmp2->parent = tmp;
 
-            if (!tmp3 || tmp3 == node) {
-                if (!tmp3)
-                    node->parent = nullptr;
-
+            if (tmp3 == node) {
+                // we performed both halves of the double rotation
                 tmp = node;
                 tmp2 = node->parent;
                 tmp3 = tmp2 ? tmp2->parent : nullptr;
                 prim = &Node::right;
                 sec = &Node::left;
+            } else if (!tmp3) {
+                // there is no grandfather, we are done
+                node->parent = nullptr;
+                break;
             } else {
+                // we move to the top half of the double rotation
                 if ((node->parent = tmp3->parent)) {
                     if (node->parent->left == tmp3)
                         node->parent->left = node;
@@ -189,6 +203,9 @@ class Tree {
 
                 tmp = tmp2;
                 tmp2 = tmp3;
+
+                // this is to signify whether we do the top half
+                // or the bottom one
                 tmp3 = node;
             }
         }
