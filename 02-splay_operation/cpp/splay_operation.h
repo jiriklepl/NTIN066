@@ -1,3 +1,4 @@
+#include <tuple>
 #include <utility>
 
 // A node of the tree
@@ -152,17 +153,17 @@ class Tree {
     // If a single rotation needs to be performed, perform it as the last rotation
     // (i.e., to move the splayed node to the root of the tree).
     virtual void splay(Node* node) {
-        Node* tmp;
-        Node* tmp2;
-        Node* tmp3;
-        Node* Node::* prim;
-        Node* Node::* sec;
+        constexpr static auto&& init_variables = [](Node* node) {
+            return std::make_tuple(
+                node,
+                node->parent,
+                node->parent ? node->parent->parent : nullptr,
+                &Node::right,
+                &Node::left);
+        };
 
-        tmp = node;
-        tmp2 = node->parent;
-        tmp3 = tmp2 ? tmp2->parent : nullptr;
-        prim = &Node::right;
-        sec = &Node::left;
+        auto variables = init_variables(node);
+        auto&& [tmp, tmp2, tmp3, prim, sec] = variables;
 
         while (tmp2) {
             // if tmp is tmp2's primary son
@@ -176,30 +177,22 @@ class Tree {
             // half of the double rotation
             // (alternates between bottom and top - in this order)
             if ((tmp2->*sec = tmp->*prim))
-                (tmp->*prim)->parent = tmp2;
+                (tmp2->*sec)->parent = tmp2;
             
-            tmp->*prim = tmp2;
-            tmp2->parent = tmp;
+            (tmp->*prim = tmp2)->parent = tmp;
 
             if (tmp3 == node) {
-                // we performed both halves of the double rotation
-                tmp = node;
-                tmp2 = node->parent;
-                tmp3 = tmp2 ? tmp2->parent : nullptr;
-                prim = &Node::right;
-                sec = &Node::left;
+                // we performed both halves of the double rotation, we start again
+                variables = init_variables(node);
             } else if (!tmp3) {
                 // there is no grandfather, we are done
-                node->parent = nullptr;
                 break;
             } else {
                 // we move to the top half of the double rotation
-                if ((node->parent = tmp3->parent)) {
-                    if (node->parent->left == tmp3)
-                        node->parent->left = node;
-                    else
-                        node->parent->right = node;
-                }
+
+                // we set node's parent to the tmp3's parent
+                if ((node->parent = tmp3->parent))
+                    node->parent->*((node->parent->*prim == tmp3) ? prim : sec) = node;
 
                 tmp = tmp2;
                 tmp2 = tmp3;
