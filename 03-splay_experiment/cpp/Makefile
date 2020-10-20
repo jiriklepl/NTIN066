@@ -11,7 +11,7 @@ test: splay_experiment
 	done
 
 INCLUDE ?= .
-CXXFLAGS=-std=c++11 -O2 -Wall -Wextra -g -Wno-sign-compare -I$(INCLUDE)
+CXXFLAGS=-std=c++17 -O2 -Wall -Wextra -g -Wno-sign-compare -I$(INCLUDE)
 
 splay_experiment: splay_operation.h splay_experiment.cpp $(INCLUDE)/random.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@

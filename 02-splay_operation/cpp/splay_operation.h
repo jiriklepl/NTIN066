@@ -153,24 +153,59 @@ class Tree {
     // If a single rotation needs to be performed, perform it as the last rotation
     // (i.e., to move the splayed node to the root of the tree).
     virtual void splay(Node* node) {
-        Node* parent;
-        while ((parent = node->parent) && parent->parent) {
-            if (((parent->right == node) && (parent->parent->right == parent)) ||
-                ((parent->left  == node) && (parent->parent->left  == parent))) {
-                // zigzig
-                rotate(parent);
-                rotate(node);
+        constexpr static auto&& init_variables = [](Node* node) {
+            return std::make_tuple(
+                node,
+                node->parent,
+                node->parent ? node->parent->parent : nullptr);
+        };
+
+        auto variables = init_variables(node);
+        auto&& [tmp, tmp2, tmp3] = variables;
+
+        auto prim = &Node::right;
+        auto sec = &Node::left;
+
+        while (tmp2) {
+            // if tmp is tmp2's primary son
+            // we switch to the other instance of the half of the double rotation
+            // by swapping the meanings of primary/secondary and setting tmp to node
+            if (tmp == tmp2->*prim) {
+                std::swap(prim, sec);
+                tmp = node;
+            }
+
+            // half of the double rotation
+            // (alternates between bottom and top - in this order)
+            if ((tmp2->*sec = tmp->*prim))
+                (tmp2->*sec)->parent = tmp2;
+            
+            (tmp->*prim = tmp2)->parent = tmp;
+
+            if (tmp3 == node) {
+                // we performed both halves of the double rotation, we start again
+                variables = init_variables(node);
+            } else if (!tmp3) {
+                // there is no grandfather, we are done
+                break;
             } else {
-                // zigzag
-                rotate(node);
-                rotate(node);
+                // we move to the top half of the double rotation
+
+                // we set node's parent to the tmp3's parent
+                if ((node->parent = tmp3->parent))
+                    node->parent->*((node->parent->*prim == tmp3) ? prim : sec) = node;
+
+                tmp = tmp2;
+                tmp2 = tmp3;
+
+                // this is to signify whether we do the top half
+                // or the bottom one
+                tmp3 = node;
             }
         }
 
-        if (node->parent)
-            rotate(node);
-
         root = node;
+        node->parent = nullptr;
     }
 
     // Destructor to free all allocated memory.
