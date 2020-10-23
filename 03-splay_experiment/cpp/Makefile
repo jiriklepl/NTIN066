@@ -1,4 +1,4 @@
-STUDENT_ID ?= PLEASE_SET_STUDENT_ID
+STUDENT_ID ?= 80
 
 .PHONY: test
 test: splay_experiment
@@ -6,7 +6,7 @@ test: splay_experiment
 	@for test in sequential random subset ; do \
 		for mode in std naive ; do \
 			echo t-$$test-$$mode ; \
-			./splay_experiment $$test $(STUDENT_ID) $$mode >out/t-$$test-$$mode ; \
+			/bin/time ./splay_experiment $$test $(STUDENT_ID) $$mode >out/t-$$test-$$mode ; \
 		done ; \
 	done
 
