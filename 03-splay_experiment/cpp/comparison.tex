@@ -47,7 +47,7 @@
 
 \subsection*{Prolog}
 
-Následují diskuze tří zadaných testů a analýzy pozorovaných domnělých závislostí. Pro úvod by bylo vhodné říct, že všechny testy měří a průměrují počet provedených rotací naivní a standardní implementace splay stromu. Tento test je poměrně dobrým měřítkem časové složitosti práce nad těmito strukturami, neboť u splay stromů počet rotací odpovídá počtu čtení a dereferencí prvků, které vedou k přidanému/hledanému prvku (právě přidání a hledání prvku testy měří).
+Následují diskuze tří zadaných testů (se seedem 80) a analýzy pozorovaných domnělých závislostí. Pro úvod by bylo vhodné říct, že všechny testy měří a průměrují počet provedených rotací naivní a standardní implementace splay stromu. Tento test je poměrně dobrým měřítkem časové složitosti práce nad těmito strukturami, neboť u splay stromů počet rotací odpovídá počtu čtení a dereferencí prvků, které vedou k přidanému/hledanému prvku (právě přidání a hledání prvku testy měří).
 
 \subsection*{Sequential test}
 
@@ -70,7 +70,7 @@ Složitost hledání prvku ve standardní implementaci je v $\Theta(\alpha(n))$,
 \subsection*{Random test}
 
 \begin{figure}[!htb]
-    \caption{Random test results}
+    \caption{Random test results (seed 80)}
     \label{rng_results}
     \includegraphics{random.pdf}    
 \end{figure}
@@ -79,7 +79,7 @@ V testu s náhodným přístupem k prvkům dosahují obě implementace obdobnéh
 
 Jediným překvapením zde je podobnost výsledků naivní a standardní implementace. V dalším testu najdeme vysvětlení, které by částečně mohlo vysvětlovat i toto (včetně toho, proč naivní implementace dává lepší výsledky). Ono vysvětlení však zde není uspokojivé.
 
-Co nám dá vysvětlení logaritmického počtu rotací je, že v libovolném nevyváženém podstromě budeme pravděpodobněji vyrotovávat prvky z větší (mohutnější) strany (na figuře \ref{rot} to je levá $(a, A_1, A_2)$). Když tedy budeme uvažovat tomu odpovídající rotaci prvku $a$, tak prvky z $A_1$ posuneme výš, prvky $B$ z níž a prvky z $A_2$ budou stále ve stejné výšce, sníží se velikost levého podstromu a pravděpodobnost přístupu k jeho prvkům, opačně s pravým podstromem. Tedy naivní splay stromy se mají tendenci samy vyvažovat. A pak tedy tradičně podle průměrné hloubky.
+Co nám dá vysvětlení logaritmického počtu rotací je, že v libovolném nevyváženém podstromě budeme pravděpodobněji vyrotovávat prvky z větší (mohutnější) strany (na figuře \ref{rot} to je levá $(a, A_1, A_2)$). Když tedy budeme uvažovat tomu odpovídající rotaci prvku $a$, tak prvky z $A_1$ posuneme výš, prvky z $B$ níž a prvky z $A_2$ budou stále ve stejné výšce, sníží se velikost levého podstromu a pravděpodobnost přístupu k jeho prvkům, opačně s pravým podstromem. Tedy naivní splay stromy se mají tendenci samy vyvažovat. A pak tedy tradičně podle průměrné hloubky.
 
 \begin{figure}[!htb]
     \caption{Rotation}
@@ -130,7 +130,7 @@ Co nám dá vysvětlení logaritmického počtu rotací je, že v libovolném ne
 \subsection*{Subset test}
 
 \begin{figure}[!htb]
-    \caption{Subset test results}
+    \caption{Subset test results (seed 80)}
     \label{subset_results}
     \includegraphics{subset2d.pdf}    
 \end{figure}
