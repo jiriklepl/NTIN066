@@ -1,0 +1,41 @@
+set terminal pdf
+
+# SEQUENTIAL
+set key left top
+set key vertical Left
+set key reverse invert
+set xlabel "set size"
+set ylabel "Log (avg. rotations per operation)"
+
+set output "sequential.pdf"
+plot "./out/t-sequential-std" using 1:(log($2)) pt 6 title "std", \
+     "./out/t-sequential-naive" using 1:(log($2)) title "naive", \
+     log((x+1)*5/12+1/6) title "(x+1)*5/12+1/6", \
+     log(3.8) lt 7 title "3.8 (approx. inverse-Ackermann)"
+
+# RANDOM
+set output "random.pdf"
+plot "./out/t-random-std" using 1:(log($2)) title "std", \
+     "./out/t-random-naive" using 1:(log($2)) title "naive", \
+     log(log(x)/log((1+sqrt(5))/2)*5/6+1/6) title "log_{/Symbol f}(x)*5/6+1/6"
+
+# SUBSET2D
+set key bmargin
+set key horizontal Left
+set output "subset2d.pdf"
+plot "./out/t-subset-std" u 2:($1 == 10 ? log($3) : 1/0) w linespoints title "std10", \
+     "./out/t-subset-naive" u 2:($1 == 10 ? log($3) : 1/0) w linespoints title "naive10", \
+     "./out/t-subset-std" u 2:($1 == 100 ? log($3) : 1/0) w linespoints title "std100", \
+     "./out/t-subset-naive" u 2:($1 == 100 ? log($3) : 1/0) w linespoints title "naive100", \
+     "./out/t-subset-std" u 2:($1 == 1000 ? log($3) : 1/0) w linespoints lt 7 title "std1000", \
+     "./out/t-subset-naive" u 2:($1 == 1000 ? log($3) : 1/0) w linespoints title "naive1000", \
+
+# SUBSET
+set key default
+set key left top
+set xlabel "set size" rotate parallel
+set ylabel "subset size" rotate parallel
+set zlabel "Log (avg. rotations per operation)" rotate parallel
+set output "subset.pdf"
+splot "./out/t-subset-std" using 2:1:(log($3)) title "std", \
+      "./out/t-subset-naive" using 2:1:(log($3)) title "naive"
