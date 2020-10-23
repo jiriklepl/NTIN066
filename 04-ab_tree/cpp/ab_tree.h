@@ -122,6 +122,8 @@ class ab_tree {
         ab_node *n = root;
         std::size_t i;
 
+        // returns by value whether the child's parent has the key
+        // parent will contain the child's parent and i the child's index
         auto find_parent = [](int key, ab_node *&parent, std::size_t &i, const ab_node *child) {
             do {
                 if (parent->find_branch(key, i))
@@ -137,6 +139,8 @@ class ab_tree {
         n->insert_branch(i, key, nullptr);
 
         while (n->keys.size() >= b) {
+            // splitting n into n and m
+
             ab_node * const m = new_node();
             i = n->keys.size() / 2 + 1;
             key = n->keys[i - 1];
@@ -150,6 +154,8 @@ class ab_tree {
             n->children.erase(n->children.begin() + i, n->children.end());
 
             if (n == root) {
+                // we need a new layer
+
                 root = new_node();
                 root->children.emplace_back(n);
                 root->children.emplace_back(m);
@@ -157,6 +163,7 @@ class ab_tree {
 
                 return;
             } else {
+                // we add m as n's right sibling and propagate upwards
                 ab_node *parent = root;
 
                 find_parent(key, parent, i, n);
