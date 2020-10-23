@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"clang-tidy.compilerArgs": [
+			"-std=c++17"
+		],
+		"files.associations": {
+			"cassert": "cpp"
+		},
+		"cSpell.language": "en,cs"
+	}
+}
