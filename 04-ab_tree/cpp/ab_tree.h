@@ -21,7 +21,7 @@ class ab_node {
 
     // If this node contains the given key, return true and set i to key's position.
     // Otherwise return false and set i to the first key greater than the given one.
-    bool find_branch(int key, int &i)
+    bool find_branch(int key, std::size_t &i)
     {
         i = 0;
         while (i < keys.size() && keys[i] <= key) {
@@ -33,7 +33,7 @@ class ab_node {
     }
 
     // Insert a new key at posision i and add a new child between keys i and i+1.
-    void insert_branch(int i, int key, ab_node *child)
+    void insert_branch(std::size_t i, int key, ab_node *child)
     {
         keys.insert(keys.begin() + i, key);
         children.insert(children.begin() + i + 1, child);
@@ -98,11 +98,11 @@ class ab_tree {
     }
 
     // Find a key: returns true if it is present in the tree.
-    bool find(int key)
+    bool find(int key) const
     {
         ab_node *n = root;
         while (n) {
-            int i;
+            std::size_t i;
             if (n->find_branch(key, i))
                 return true;
             n = n->children[i];
@@ -119,6 +119,50 @@ class ab_tree {
     // Insert: add key to the tree (unless it was already present).
     void insert(int key)
     {
-        // FIXME: Implement
+        ab_node *n = root;
+        std::size_t i;
+
+        auto find_parent = [](int key, ab_node *&parent, std::size_t &i, const ab_node *child) {
+            do {
+                if (parent->find_branch(key, i))
+                    return true;
+            } while (parent->children[i] != child && (parent = parent->children[i]));
+
+            return false;
+        };
+
+        if (find_parent(key, n, i, nullptr))
+            return;
+
+        n->insert_branch(i, key, nullptr);
+
+        while (n->keys.size() >= b) {
+            ab_node * const m = new_node();
+            i = n->keys.size() / 2 + 1;
+            key = n->keys[i - 1];
+
+            std::move(n->keys.begin() + i, n->keys.end(),
+                std::back_inserter(m->keys));
+            std::move(n->children.begin() + i, n->children.end(),
+                std::back_inserter(m->children));
+
+            n->keys.erase(n->keys.begin() + (i - 1), n->keys.end());
+            n->children.erase(n->children.begin() + i, n->children.end());
+
+            if (n == root) {
+                root = new_node();
+                root->children.emplace_back(n);
+                root->children.emplace_back(m);
+                root->keys.emplace_back(key);
+
+                return;
+            } else {
+                ab_node *parent = root;
+
+                find_parent(key, parent, i, n);
+                parent->insert_branch(i, key, m);
+                n = parent;
+            }
+        }
     }
 };
