@@ -24,7 +24,7 @@
 
 \fancyhf{} % This makes sure we do not have other information in our header or footer.
 
-\rhead{\footnotesize J. Klepl}
+\rhead{splay\_experiment \hfill Jiří Klepl}
 
 \cfoot{\footnotesize \thepage} 
 
@@ -59,11 +59,11 @@ Následují diskuze tří zadaných testů (se seedem 80) a analýzy pozorovaný
 
 Ve výsledcích tohoto testu znázorněných ve figuře \ref{seq_results} můžeme vidět velký rozdíl v počtu provedených rotací naivní a standardní implementace.
 
-U obou implementací je složitost přidávání $n$ prvků v $\Theta(n)$, tedy konstantní na jeden prvek. Výsledkem je vždy lineární seznam (při vzestupném přidávání propojen po levých synech). Tento výsledný tvar budou mít obě implementace po každém dokončení (přidávací/hledací) sekvence.
+U obou implementací je složitost přidávání $n$ prvků v $\Theta(n)$, tedy konstantní na jeden prvek, s tím i počet rotací. Výsledkem je vždy lineární seznam (při vzestupném přidávání propojen po levých synech). Tento výsledný tvar budou mít obě implementace po každém dokončení (přidávací/hledací) sekvence.
 
-Složitost hledání prvku v naivní implementaci je v $\Theta(n)$. Strom má během hledání vždy tvar dvou hlavami spojených seznamů, z nichž jednomu odtrháváme listy a přidáváme je v hlavě do druhého. Jednoduchou matematickou úpravou proto dostaneme velice přesnou lineární aproximaci závislosti průměrného počtu rotací na velikosti pole.
+Složitost hledání prvku (a jím způsobený počet provedených rotací) v naivní implementaci je v $\Theta(n)$. Strom má během hledání vždy tvar dvou hlavami spojených seznamů, z nichž jednomu odtrháváme listy a přidáváme je v hlavě do druhého. Jednoduchou matematickou úpravou proto dostaneme velice přesnou lineární aproximaci závislosti průměrného počtu rotací na velikosti pole.
 
-Složitost hledání prvku ve standardní implementaci je v $\Theta(\alpha(n))$, kde $\alpha$ je inverzní Ackermannova funkce, důkaz toho lze nalézt na internetu. Tato analýza odpovídá mazání krajních bodů, když splay stromem reprezentujeme deque.
+Složitost hledání prvku (a jím způsobený počet provedených rotací) ve standardní implementaci je v $\Theta(\alpha(n))$, kde $\alpha$ je inverzní Ackermannova funkce, důkaz toho lze nalézt na internetu. Tato analýza odpovídá mazání krajních bodů, když splay stromem reprezentujeme deque.
 
 \pagebreak
 
@@ -148,7 +148,7 @@ Uvažujme \textbf{``podmnožinovou špičku'' stromu} (budeme značit $A_i$, či
 
 Špička $A$ je (z definice) vždy spojitá a obsahuje prvky pouze z podmnožiny, tedy je-li přistupovaný prvek v tomto podgrafu, nikdy ani nesáhneme na prvek, který by v $A$ nebyl (pozn. rotace neuvede na cestu od prvku z $A$ ke kořeni prvek, který by nebyl z $A$). Tedy zbytek stromu je irelevantní při přistupování k prvkům z $A$.
 
-Teď jen ukážeme, že prvky $A_i$ jsou i v $A_{i+1}$. Nikdy nenastane vyrotovávání prvku, který není z $A$. Tedy jediná relevantí situace je, když vyrotovávaný prvek (nutně z podmnožiny) je těsně pod $A$ (jinak se nic nerozbíjí, protože jsme v nějakém podstromě až dále pod $A$ a na žádný prvek z $A$ v rotacích nesáhneme). První situace, kdy vyrotovávaný prvek (který ještě není v $A$) manipuluje s nějakým prvkem z $A$, je, když už v $A$ sám je (neboť manipuluje jen se svým rodičem), tedy jeho rodič je nutně v $A$. Tedy jakákoliv snaha o rozbití množiny $A$ by nám dala spor.
+Teď jen ukážeme, že prvky $A_i$ jsou i v $A_{i+1}$. Nikdy nenastane vyrotovávání prvku, který není z $A$. Tedy jediná relevantní situace je, když vyrotovávaný prvek (nutně z podmnožiny) je těsně pod $A$ (jinak se nic nerozbíjí, protože jsme v nějakém podstromě až dále pod $A$ a na žádný prvek z $A$ v rotacích nesáhneme). První situace, kdy vyrotovávaný prvek (který ještě není v $A$) manipuluje s nějakým prvkem z $A$, je, když už v $A$ sám je (neboť manipuluje jen se svým rodičem), tedy jeho rodič je nutně v $A$. Tedy jakákoliv snaha o rozbití množiny $A$ by nám dala spor.
 
 Předešlé dva odstavce nám dohromady dají, že přistoupíme-li k prvkům z nějaké podmnožiny a poté nepřistoupíme k žádnému jinému a poté opět přistoupíme k prvkům z této podmnožiny, tak již vůbec nesáhneme na prvek, který by nebyl v této podmnožině.
 
