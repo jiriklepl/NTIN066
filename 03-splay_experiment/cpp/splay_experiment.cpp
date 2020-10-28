@@ -54,12 +54,6 @@ public:
             while (node->parent)
                 rotate(node);
         } else {
-            Node* tmp = node;
-
-            while ((tmp = tmp->parent)) {
-                num_rotations++;
-            }
-
             Tree::splay(node);
         }
     }
