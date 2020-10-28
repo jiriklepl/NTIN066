@@ -9,7 +9,8 @@
 			"-std=c++17"
 		],
 		"files.associations": {
-			"cassert": "cpp"
+			"cassert": "cpp",
+			"tuple": "cpp"
 		},
 		"cSpell.language": "en,cs"
 	}
