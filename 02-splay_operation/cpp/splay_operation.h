@@ -1,6 +1,3 @@
-#include <tuple>
-#include <utility>
-
 // A node of the tree
 class Node {
   public:
