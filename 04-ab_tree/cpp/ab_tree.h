@@ -1,4 +1,5 @@
 #include <limits>
+#include <stack>
 #include <vector>
 #include <iostream>
 
@@ -122,19 +123,15 @@ class ab_tree {
         ab_node *n = root;
         std::size_t i;
 
-        // returns by value whether the child's parent has the key
-        // parent will contain the child's parent and i the child's index
-        auto find_parent = [](int key, ab_node *&parent, std::size_t &i, const ab_node *child) {
-            do {
-                if (parent->find_branch(key, i))
-                    return true;
-            } while (parent->children[i] != child && (parent = parent->children[i]));
+        // holds the path to the inserted key
+        std::stack<std::pair<ab_node * const, std::size_t>> parents;
 
-            return false;
-        };
+        do {
+            if (n->find_branch(key, i))
+                return;
 
-        if (find_parent(key, n, i, nullptr))
-            return;
+            parents.emplace(n, i);
+        } while (n->children[i] != nullptr && (n = n->children[i]));
 
         n->insert_branch(i, key, nullptr);
 
@@ -164,9 +161,10 @@ class ab_tree {
                 return;
             } else {
                 // we add m as n's right sibling and propagate upwards
-                ab_node *parent = root;
 
-                find_parent(key, parent, i, n);
+                parents.pop();
+                const auto [parent, i] = parents.top();
+
                 parent->insert_branch(i, key, m);
                 n = parent;
             }
