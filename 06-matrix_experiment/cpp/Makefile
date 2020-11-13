@@ -9,10 +9,10 @@ test: matrix_experiment_sim matrix_experiment_real
 	done
 	@for impl in smart naive ; do \
 		echo "t-real-$$impl" ; \
-		./matrix_experiment_real $$impl >out/t-real-$$impl ; \
+		time ./matrix_experiment_real $$impl >out/t-real-$$impl ; \
 	done
 
-CXXFLAGS=-std=c++11 -O3 -Wall -Wextra -g -Wno-sign-compare
+CXXFLAGS=-std=c++17 -O3 -Wall -Wextra -DNDEBUG -pedantic -march=native -s -Wno-sign-compare
 
 matrix_experiment_sim: matrix_transpose.h matrix_tests.h matrix_experiment_sim.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) matrix_experiment_sim.cpp -o $@
