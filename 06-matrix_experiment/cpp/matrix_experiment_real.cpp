@@ -42,7 +42,7 @@ class Matrix {
 
 void real_test(bool naive)
 {
-    for (int e=40; e<=112; e++) {
+    for (int e=40; e<=120; e++) {
         unsigned N = (unsigned) pow(2, e/8.);
         Matrix m(N);
 
