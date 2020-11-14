@@ -27,22 +27,17 @@ void trans(unsigned i, unsigned j, unsigned width) {
     }
 }
 
+// the trans_swapped rectangle has to have nonzero area
 void trans_swap(unsigned i, unsigned j, unsigned height, unsigned width) {
-    if (height == 1 || width == 1) {
-        if (i != j) {
-            swap(i, j, j, i);
-            if (height == 2 || width == 2)
-                swap(i + height - 1, j + width - 1, j + width - 1, i + height - 1);
-        }
-    } else {
-        const unsigned b_height = height / 2;
-        const unsigned t_height = height - b_height;
+    if (width + height == 2) { // both are 1
+        swap(j, i, i, j);
+    } else if (width >= height) {
         const unsigned r_width = width / 2;
         const unsigned l_width = width - r_width;
 
-        trans_swap(i, j, t_height, l_width); // top left
-        trans_swap(i + t_height, j, b_height, l_width); // bottom left
-        trans_swap(i + t_height, j + l_width, b_height, r_width); // bottom right
-        trans_swap(i, j + l_width, t_height, r_width); // top right
+        trans_swap(j, i, l_width, height); // left half with swapped axes
+        trans_swap(j + l_width, i, r_width, height); // right half with swapped axes
+    } else { // this branch should be rare
+        trans_swap(j, i, width, height); // just swap axes so width > height
     }
 }
