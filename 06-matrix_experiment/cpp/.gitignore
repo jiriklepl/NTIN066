@@ -1,2 +1,10 @@
+# binaries:
 matrix_experiment_real
 matrix_experiment_sim
+
+# latex files:
+*.log
+*.fls
+*.aux
+*.fdb_latexmk
+*.synctex.gz
