@@ -8,6 +8,12 @@
 		"clang-tidy.compilerArgs": [
 			"-std=c++17"
 		],
+		"files.insertFinalNewline": true,
+		"files.trimTrailingWhitespace": true,
+		"[tex]":{
+			"editor.wordWrap": "bounded",
+			"editor.wordWrapColumn": 80,
+		},
 		"files.associations": {
 			"cassert": "cpp",
 			"tuple": "cpp"
