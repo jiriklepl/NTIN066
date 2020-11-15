@@ -32,12 +32,12 @@ class Matrix {
 
     void naive_transpose()
     {
-        for (unsigned i=0; i<N; i++)
-            for (unsigned j=0; j<i; j++)
+        for (volatile unsigned i=0; i<N; i++)
+            for (volatile unsigned j=0; j<i; j++)
                 swap(i, j, j, i);
     }
 
-#include "matrix_transpose.h"
+#include "matrix_transpose_real.h"
 };
 
 void real_test(bool naive)
