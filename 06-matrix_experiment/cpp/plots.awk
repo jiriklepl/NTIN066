@@ -8,14 +8,17 @@ BEGIN {
     print "set logscale x 2" | gnuplot
     print "set logscale y 2" | gnuplot
     print "set yrange [2**(-10):1]" | gnuplot
-    print "set ylabel \"avg. cache-misses per swap (=P)\"" | gnuplot
-    print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
     print "set xtics 1,2" | gnuplot
     print "set key bmargin" | gnuplot
     print "set key horizontal Left" | gnuplot
     print "set key left" | gnuplot
     print "set key reverse" | gnuplot
     while (ls | getline) {
+        smart = naive = $0
+        sub("naive", "smart", smart)
+        plot = "plot \"" smart "\" title \"smart\" with linespoints"
+        plot = plot ", \"" naive "\" title \"naive\" with linespoints"
+
         if ($2 == "sim") {
             m = int(substr($3,2))
             b = int(substr($4,2))
@@ -33,17 +36,15 @@ BEGIN {
                 b_ /= 2
                 b_pow++
             }
-            print "set xrange [2**("int(m_pow / 2)"):8192]" | gnuplot
-            print "set yrange [2**(-"b_pow"):1]" | gnuplot
 
             print "set output \"sim-m" m "-b" b ".pdf\"" | gnuplot
+            print "set xrange [2**("int(m_pow / 2)"):8192]" | gnuplot
+            print "set yrange [2**(-"b_pow"):1]" | gnuplot
+            print "set ylabel \"avg. cache-misses per access (=P)\"" | gnuplot
+            print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
 
-            smart = naive = $0
-            sub("naive", "smart", smart)
 
             limit = 0.5 + 1 / (b * 2)
-            plot = "plot \"" smart "\" title \"smart\" with linespoints"
-            plot = plot ", \"" naive "\" title \"naive\" with linespoints"
             plot = plot ", (" limit ") title \"naive limit (" int(limit*1000)/1000 ")\""
 
             lower = 1 / b
@@ -63,6 +64,13 @@ BEGIN {
 
             print plot | gnuplot
         } else {
+            b = 64
+            print "set output \"real.pdf\"" | gnuplot
+            print "set autoscale" | gnuplot
+            print "set ylabel \"avg. time per item (=t [ns])\"" | gnuplot
+            print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
+
+            print plot | gnuplot
         }
     }
     close(ls)
