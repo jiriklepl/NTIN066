@@ -85,7 +85,6 @@ class CachedMatrix {
     {
         EXPECT(i < N && j < N, "Write out of range: " + coord_string(i, j) + ".");
         unsigned addr = pos(i, j);
-        access(addr);
         items[addr] = data;
     }
 
