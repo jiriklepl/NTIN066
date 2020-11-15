@@ -45,11 +45,11 @@ BEGIN {
 
 
             limit = 0.5 + 1 / (b * 2)
-            plot = plot ", (" limit ") title \"naive limit (" int(limit*1000)/1000 ")\""
+            plot = plot ", (" limit ") title \"naive limit\""
 
             lower = 1 / b
             upper = b <= m / (4 * b) ? lower * 2 : lower * 3
-            plot = plot ", (" lower ") title \"lower bound (" int(lower*1000)/1000 ")\""
+            plot = plot ", (" lower ") title \"lower bound\""
 
             if (b > m / (2 * b)) {
                 b_ = b
@@ -57,10 +57,10 @@ BEGIN {
                     b_ /= 2
 
                 approx = 1 /  b_
-                plot = plot ", (" approx ") title \"upper bound of ideal (" int(approx*1000)/1000 ")\""
+                plot = plot ", (" approx ") title \"upper bound of ideal\""
                 upper = approx * 2
             }
-            plot = plot ", (" upper ") title \"upper bound of non-ideal (" int(upper*1000)/1000 ")\""
+            plot = plot ", (" upper ") title \"upper bound of non-ideal\""
 
             print plot | gnuplot
         } else {
