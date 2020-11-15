@@ -8,6 +8,8 @@ BEGIN {
     print "set logscale x 2" | gnuplot
     print "set logscale y 2" | gnuplot
     print "set yrange [2**(-10):1]" | gnuplot
+    print "set ylabel \"avg. cache-misses per swap (=P)\"" | gnuplot
+    print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
     print "set xtics 1,2" | gnuplot
     print "set key bmargin" | gnuplot
     print "set key horizontal Left" | gnuplot
@@ -17,13 +19,22 @@ BEGIN {
         if ($2 == "sim") {
             m = int(substr($3,2))
             b = int(substr($4,2))
+
+            m_ = m
+            m_pow = 0
+            while (m_ > 1) {
+                m_ /= 2
+                m_pow++
+            }
+
             b_ = b
-            pow = 0
+            b_pow = 0
             while (b_ >= 1) {
                 b_ /= 2
-                pow++
+                b_pow++
             }
-            print "set yrange [2**(-"pow"):1]" | gnuplot
+            print "set xrange [2**("int(m_pow / 2)"):8192]" | gnuplot
+            print "set yrange [2**(-"b_pow"):1]" | gnuplot
 
             print "set output \"sim-m" m "-b" b ".pdf\"" | gnuplot
 
@@ -36,7 +47,7 @@ BEGIN {
             plot = plot ", (" limit ") title \"naive limit (" int(limit*1000)/1000 ")\""
 
             lower = 1 / b
-            upper = lower * 3
+            upper = b <= m / (4 * b) ? lower * 2 : lower * 3
             plot = plot ", (" lower ") title \"lower bound (" int(lower*1000)/1000 ")\""
 
             if (b > m / (2 * b)) {
@@ -46,7 +57,7 @@ BEGIN {
 
                 approx = 1 /  b_
                 plot = plot ", (" approx ") title \"upper bound of ideal (" int(approx*1000)/1000 ")\""
-                upper = approx * 3
+                upper = approx * 2
             }
             plot = plot ", (" upper ") title \"upper bound of non-ideal (" int(upper*1000)/1000 ")\""
 
