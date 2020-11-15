@@ -175,4 +175,34 @@ V částech \ref{expected} a \ref{results} lze dobře vidět vliv zarovnanosti d
 
 Nejlepších výsledků bude dosaženo jedině na zarovnaných datech (či na extrémě malých maticích, kde strategie transponování není rozhodujícím faktorem) a výsledky jsou zlepšovány se zvětšováním velikosti cache-line (díky menšímu potřebnému počtu načtení) za udržení výše zmíněného předpokladu na konfiguraci cache.
 
+\pagebreak
+
+\section{Reálné testy}
+
+Stroj, na kterém měření bylo provedeno má konfiguraci $L1 = 256 kB, L2 = 1 MB, L3 = 6 MB, B = 64B$ a clock-rate $3.2 GHz$ (Haswell i5-4460), ze simulací bychom tedy očekávali průměrný počet cache-miss $P = \frac{1}{16}$.
+
+\subsection{Vedlejší faktory}
+
+V těchto testech stojí za zmínku, že neměříme přímo počty cache-miss, ale průměrný čas trávený prací nad jedním z $N^2$ prvků, tedy mají zde vliv, mimo již zmíněné cache-miss i volání pracujících subrutin ($T$ a $TS$) a jejich vnitřní logika, zde potom má vliv i predikce skoků (což je tématika, která má u moderních počítačů podobný vliv, jako analýza cache). Dalším vlivem může být funkce optimalizéru, jak již bylo předem řečeno.
+
+Proto je zde používán upravený algoritmus s téměř inlinovaným kódem, pokud dokáže podmatice pohodlně zarovnat na mocniny dvou (jejich abstrakce, ne data), v takových případech pak téměř úplně vymizí všechny vlivy ze strany logiky a predikce skoků, neboť takto upravený kód je z pohledu procesoru mnohem jednodušší.
+
+Dále bylo u naivní implemetace zákázáno optimalizovat prováděný algoritmus, to vedlo k různým vektorizacím apod. (ale tento zákaz optimalizací výrazně nezhoršil celkový čas běhu nad celkovou množinou matic - zpomalení v jednotkách procent). Naivní implementace jinak byla o polovinu lepší do velikosti $N = 1024$.
+
+\subsection{Výsledky}
+
+\begin{figure}[!hbt]
+	\caption{Real experiment}
+	\label{realgraph}
+	\includegraphics{real.pdf}
+\end{figure}
+
+Tvar grafu (ve figuře \ref{realgraph}) chytré implementace od $N = 32$ do $N=512$ napovídá, že se matici daří přednačíst do $L2$ a pracuje pak pohodlně s cachí $L1$, od $N=1024$ se nejspíš přestává celá vejít do $L3$ a ustálí se práce implementace až na $N=2048$ a dál. Graf nijak nenaznačuje jiné významné zdroje šumu.
+
+Do $N=1024$ graf naivní implementace napovídá cache-miss v $L1$ cachi ($5 \cdot \frac{1}{3.2 GHz} \cdot .5 \approx 0.78$ jen na vyřízení cache-miss).
+
+Tvar naivní implementace naznačuje, že práce algoritmu nad velkými maticemi způsobuje opakované cache-miss v $L3$ cachi ($60 \cdot \frac{1}{3.2 GHz} \cdot {.5} \approx 9.4 ns$ jen na vyřízení cache-miss).
+
+Celkem bylo chytrou implementací docíleno trojnásobného zrychlení běhu algoritmu (celkově nad všemi maticemi).
+
 \end{document}
