@@ -75,15 +75,4 @@ BEGIN {
     }
     close(ls)
     close(gnuplot)
-    # smart=$(echo $naive | sed "s/naive/smart/")
-    # b=$(echo $naive | sed -n "s/.*b\([0-9]\+\).*/\1/p")$
-    # if $(echo $naive | grep)
-    # gnuplot -e "\
-    #     set terminal pdf size 6,3; \
-    #     set output \"${smart}_vs_${naive}.pdf\"; \
-    #     set logscale x 2; \
-    #     set xtics 4,2; \
-    #     set key top left; \
-    #     plot \"out/$smart\" title \"smart\" with linespoints, \
-    #     \"out/$naive\" title \"naive\" with linespoints;"
 }
