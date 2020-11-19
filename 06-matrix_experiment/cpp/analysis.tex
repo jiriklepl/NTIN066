@@ -179,7 +179,7 @@ Nejlepších výsledků bude dosaženo jedině na zarovnaných datech (či na ex
 
 \section{Reálné testy}
 
-Stroj, na kterém měření bylo provedeno má konfiguraci $L1 = 256 kB, L2 = 1 MB, L3 = 6 MB, B = 64B$ a clock-rate $3.2 GHz$ (Haswell i5-4460), ze simulací bychom tedy očekávali průměrný počet cache-miss $P = \frac{1}{16}$. Použitý compiler byl gcc (Debian 10.2.0-16).
+Stroj, na kterém měření bylo provedeno má konfiguraci $L1 = 32 KB, L2 = 256 KB, L3 = 6 MB, B = 64B$, $L1$ a $L2$ jsou osmi-cestné a specifické pro dané fyzické jádro, $L3$ poté dvanácticestná a sdílená, vždy set-asociativní. Clock-rate procesoru je v rozmezí $3.2 GHz$ až $3.4 GHz)$ (Haswell i5-4460). Ze simulací bychom tedy očekávali průměrný počet cache-miss $P = \frac{1}{16}$. Použitý compiler byl gcc (verze pro Debian, 10.2.0-16).
 
 \subsection{Vedlejší faktory}
 
@@ -187,7 +187,9 @@ V těchto testech stojí za zmínku, že neměříme přímo počty cache-miss, 
 
 Proto je zde používán upravený algoritmus s téměř inlinovaným kódem, pokud dokáže podmatice pohodlně zarovnat na mocniny dvou (jejich abstrakce, ne data), v takových případech pak téměř úplně vymizí všechny vlivy ze strany logiky a predikce skoků, neboť takto upravený kód je z pohledu procesoru mnohem jednodušší.
 
-Dále bylo u naivní implemetace zákázáno optimalizovat prováděný algoritmus, to vedlo k různým vektorizacím apod. (ale tento zákaz optimalizací výrazně nezhoršil celkový čas běhu nad celkovou množinou matic - zpomalení v jednotkách procent). Naivní implementace jinak byla o polovinu lepší do velikosti $N = 1024$.
+Dále je použita úprava algoritmu, že na dostatečně malé matici (s jedním z rozměrů maximálně $4$) algoritmus přejde na ``naivní'' zpracování dané podmatice - to pomáhá zejména na malých rozměrech.
+
+Testy byly upraveny, aby používaly přesnější měření času.
 
 \subsection{Výsledky}
 
@@ -197,12 +199,30 @@ Dále bylo u naivní implemetace zákázáno optimalizovat prováděný algoritm
 	\includegraphics{real.pdf}
 \end{figure}
 
-Tvar grafu (ve figuře \ref{realgraph}) chytré implementace od $N = 32$ do $N=512$ napovídá, že se matici daří přednačíst do $L2$ a pracuje pak pohodlně s cachí $L1$, od $N=1024$ se nejspíš přestává celá vejít do $L3$ a ustálí se práce implementace až na $N=2048$ a dál. Graf nijak nenaznačuje jiné významné zdroje šumu.
+Na figuře \ref{realgraph} je zobrazen experiment s časy transponování matic od $N = 32$ do $N=32768$, kde $N=2^\frac{k}{8}; k = 40 .. 120$. Jednotlivé hodnoty rozměrů matic sledují exponenciální řadu, tak je přirozené graf znázorňovat v logaritmické škále (u osy y taktéž pro zvýraznění násobností zrychlení a zpomalení).
 
-Do $N=1024$ graf naivní implementace napovídá cache-miss v $L1$ cachi ($5 \cdot \frac{1}{3.2 GHz} \cdot .5 \approx 0.78$ jen na vyřízení cache-miss).
+Tvar grafu chytré implementace od $N = 32$ do $N=512$  napovídá, že se matici daří přednačíst do $L2$ a pracuje pak pohodlně s cachí $L1$, někdy od $N=1024$ se nejspíš přestává celá vejít do $L3$ a ustálí se práce implementace až na $N=2048$ a dál. Graf nijak nenaznačuje jiné významné zdroje šumu.
 
-Tvar naivní implementace naznačuje, že práce algoritmu nad velkými maticemi způsobuje opakované cache-miss v $L3$ cachi ($60 \cdot \frac{1}{3.2 GHz} \cdot {.5} \approx 9.4 ns$ jen na vyřízení cache-miss).
+Tvar naivní implementace, kde jsou velké výkyvy vysvětlíme za pomoci nového experimentu, který vyšetřuje vliv n-cestnosti cache.
 
-Celkem bylo chytrou implementací docíleno trojnásobného zrychlení běhu algoritmu (celkově nad všemi maticemi).
+\begin{figure}[!hbt]
+	\caption{Cache experiment}
+	\label{real128graph}
+	\includegraphics{real128.pdf}
+\end{figure}
+
+Grafy experimentu zobrazeny na figuře \ref{real128graph} ukazují zaznamenané hodnoty stejné, jako v minulém experimentu, ale od $N = 256$ do $N=32768$, kde $N=128k; k = 2..256$, tento graf není v logaritmické škále pro zvýraznění absolutních rozdílů.
+
+Na naivní implementaci lze snadno pozorovat dobře předvídatelné různě velké výkyvy, předvídatelnost postupně klesá.
+
+Tyto výkyvy jsou pravděpodobně způsobeny n-cestnostmi $L1$, $L2$ a $L3$ cache. Ty totiž způsobují, že v periodě $p = \frac{M}{n \cdot sizeof(unsigned)}$ prvky matice sdílejí stejnou množinu (kde $M$ je velikost dané cache a $n$ (n-cestnost) je počet cache-line velikosti $B$ ve množině, velikost množiny je vždy $n \cdot B$, počet množin tedy $\frac{M}{n \cdot B}$ a prvků v cache-line je $\frac{B}{sizeof(unsigned)}$; $sizeof(unsigned) = 4, B = 2^6$ pro procesor používaný v experimentu).
+
+Dané periody jsou $p_{L1} = \frac{32KB}{8 \cdot 4B} = 1024$, $p_{L_2} = \frac{256KB}{8 \cdot 4B} = 8192$ a $p_{L3} = \frac{6MB}{12 \cdot 4B} = 2^{17}$.
+
+Nyní se konečně dostáváme k samotným výkyvům. Ty největší nastávají právě, je-li $N$ dělitelné nějakou takovou periodou, v grafu zobrazeno pro $L1$ a $L2$ jako ``dominantní''. To vzniká, jak již bylo naznačeno, tím, že prvky matice v dané cache po sloupcích vždy sdílejí stejnou množinu v cache. Je zde pak další důležitý efekt působícím u moderních procesorů, tedy s pipelining, kdy procesor nafetchuje data, než je vyhodnotí. Na těchto sloupcích tedy lze nafetchovat jen $n$ prvků (n-cestnost), a tedy se procesor musí více zpomalit.
+
+Na násobcích tento efekt funguje stejně a na $N = \frac{p}{k}$ pak přibližně v síle $k^{-1}$, lze nafetchovat $kn$ prvků.
+
+S postupně rostoucím $N$ přestává být efekt $p_{L1}$ dostatečně výrazný a poté i $p_{L2}$, to je nejspíše způsobeno tím, že hlavní vliv na tvar grafu přejímá $L3$ a latence v $RAM$, obojí sdílené a vypadá velice náchylné na šum.
 
 \end{document}
