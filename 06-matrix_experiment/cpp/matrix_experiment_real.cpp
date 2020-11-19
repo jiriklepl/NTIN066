@@ -40,27 +40,35 @@ class Matrix {
 #include "matrix_transpose_real.h"
 };
 
-void real_test(unsigned min, unsigned max, std::function<unsigned(unsigned)> transform, bool naive)
+void real_test(unsigned min, unsigned max, std::function<unsigned(unsigned)> transform, void (Matrix::*volatile transpose)(), double min_time = .1)
 {
+    unsigned min_tries = 2;
+
     for (unsigned e=min; e <= max; e++) {
         const unsigned N = transform(e);
         Matrix m(N);
-
-        unsigned tries = 1;
+        unsigned tries = min_tries;
         std::chrono::duration<double> difference;
+        void (Matrix::*_transpose)() = static_cast<void (Matrix::*)()>(transpose);
+        (m.*_transpose)();
+
         do {
             auto start = std::chrono::high_resolution_clock::now();
-            for (unsigned t=0; t < tries; t++) {
-                if (naive)
-                    m.naive_transpose();
-                else
-                    m.transpose();
-            }
-            auto end = std::chrono::high_resolution_clock::now();
 
-            if ((difference = (end - start)).count() > 0.3) break;
+            for (unsigned t=0; t < tries; t++)
+                (m.*_transpose)();
+
+            auto end = std::chrono::high_resolution_clock::now();
+            if ((difference = end - start).count() >= min_time) break;
             tries *= 2;
         } while (true);
+
+        EXPECT(tries % 2 == 0, "This is odd.");
+
+        if (difference.count() >= 2 * min_time && min_tries > 2)
+            min_tries /= 2;
+        else
+            min_tries = tries;
 
         double ns_per_item = difference.count() / (N*(N-1)) / tries * 1e9;
         printf("%d\t%.6f\n", N, ns_per_item);
@@ -77,13 +85,13 @@ int main(int argc, char **argv)
     std::string mode = argv[1];
 
     if (mode == "smart")
-        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, false);
+        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, &Matrix::transpose, .5);
     else if (mode == "smart128")
-        real_test(2, 256, [](unsigned e){ return e * 128U; }, false);
+        real_test(2, 256, [](unsigned e){ return e * 128U; }, &Matrix::transpose);
     else if (mode == "naive")
-        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, true);
+        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, &Matrix::naive_transpose, .5);
     else if (mode == "naive128")
-        real_test(2, 256, [](unsigned e){ return e * 128U; }, true);
+        real_test(2, 256, [](unsigned e){ return e * 128U; }, &Matrix::naive_transpose);
     else {
         fprintf(stderr, "The argument must be either 'smart' or 'naive'\n");
         return 1;
