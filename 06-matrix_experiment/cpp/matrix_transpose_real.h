@@ -182,7 +182,7 @@ void trans(unsigned i, unsigned width) {
 
         if (width <= TRASHOLD) {
             for (unsigned x = 0U; x < width; ++x)
-                for (unsigned y = 0U; y < width; ++y)
+                for (unsigned y = 0U; y < x; ++y)
                     swap(i + x, i + y, i + y, i + x);
         } else if (l_width == r_width) {
             pre_trans_static(i, log + 1U);
