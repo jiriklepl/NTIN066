@@ -5,7 +5,7 @@
 #include <cmath>
 #include <iostream>
 
-#include <time.h>   // FIXME
+#include <chrono>
 
 using namespace std;
 
@@ -40,28 +40,29 @@ class Matrix {
 #include "matrix_transpose_real.h"
 };
 
-void real_test(bool naive)
+void real_test(unsigned min, unsigned max, std::function<unsigned(unsigned)> transform, bool naive)
 {
-    for (int e=40; e<=120; e++) {
-        unsigned N = (unsigned) pow(2, e/8.);
+    for (unsigned e=min; e <= max; e++) {
+        const unsigned N = transform(e);
         Matrix m(N);
 
-        clock_t start_time, stop_time;
         unsigned tries = 1;
+        std::chrono::duration<double> difference;
         do {
-            start_time = clock();
+            auto start = std::chrono::high_resolution_clock::now();
             for (unsigned t=0; t < tries; t++) {
                 if (naive)
                     m.naive_transpose();
                 else
                     m.transpose();
             }
-            stop_time = clock();
-            tries *= 2;
-        } while (stop_time - start_time < CLOCKS_PER_SEC/10);
-        // It is guaranteed that the total number of tries is odd :)
+            auto end = std::chrono::high_resolution_clock::now();
 
-        double ns_per_item = (double)(stop_time - start_time) / CLOCKS_PER_SEC / (N*(N-1)) / tries * 1e9;
+            if ((difference = (end - start)).count() > 0.3) break;
+            tries *= 2;
+        } while (true);
+
+        double ns_per_item = difference.count() / (N*(N-1)) / tries * 1e9;
         printf("%d\t%.6f\n", N, ns_per_item);
     }
 }
@@ -69,22 +70,24 @@ void real_test(bool naive)
 int main(int argc, char **argv)
 {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s (smart|naive)\n", argv[0]);
+        fprintf(stderr, "Usage: %s (smart|naive)[128]\n", argv[0]);
         return 1;
     }
 
     std::string mode = argv[1];
 
-    bool naive;
     if (mode == "smart")
-      naive = false;
+        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, false);
+    else if (mode == "smart128")
+        real_test(2, 256, [](unsigned e){ return e * 128U; }, false);
     else if (mode == "naive")
-      naive = true;
+        real_test(40, 120, [](unsigned e){ return (unsigned) pow(2, e/8.); }, true);
+    else if (mode == "naive128")
+        real_test(2, 256, [](unsigned e){ return e * 128U; }, true);
     else {
         fprintf(stderr, "The argument must be either 'smart' or 'naive'\n");
         return 1;
     }
 
-    real_test(naive);
     return 0;
 }
