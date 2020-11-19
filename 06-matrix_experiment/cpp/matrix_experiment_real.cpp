@@ -22,7 +22,14 @@ class Matrix {
     unsigned &item(unsigned i, unsigned j) { return items[i*N + j]; }
   public:
     unsigned N;
-    Matrix(unsigned N) { this->N = N; items.resize(N*N, 0); }
+    Matrix(unsigned N) {
+        this->N = N;
+        items.resize(N*N, 0);
+
+        for (unsigned i=0; i<N; i++)
+            for (unsigned j=0; j<N; j++)
+                item(i, j) = i*N + j;
+    }
 
     void swap(unsigned i1, unsigned j1, unsigned i2, unsigned j2)
     {
@@ -37,6 +44,13 @@ class Matrix {
                 swap(i, j, j, i);
     }
 
+    void check_result()
+    {
+        for (unsigned i = 0; i < N; i++)
+            for (unsigned j = 0; j < N; j++)
+                EXPECT(item(i, j) == j*N + i, "bad transpose");
+    }
+
 #include "matrix_transpose_real.h"
 };
 
@@ -49,21 +63,22 @@ void real_test(unsigned min, unsigned max, std::function<unsigned(unsigned)> tra
         Matrix m(N);
         unsigned tries = min_tries;
         std::chrono::duration<double> difference;
-        void (Matrix::*_transpose)() = static_cast<void (Matrix::*)()>(transpose);
-        (m.*_transpose)();
 
+        (m.*transpose)();
         do {
             auto start = std::chrono::high_resolution_clock::now();
 
             for (unsigned t=0; t < tries; t++)
-                (m.*_transpose)();
+                (m.*transpose)();
 
             auto end = std::chrono::high_resolution_clock::now();
+
             if ((difference = end - start).count() >= min_time) break;
             tries *= 2;
         } while (true);
 
         EXPECT(tries % 2 == 0, "This is odd.");
+        m.check_result();
 
         if (difference.count() >= 2 * min_time && min_tries > 2)
             min_tries /= 2;
