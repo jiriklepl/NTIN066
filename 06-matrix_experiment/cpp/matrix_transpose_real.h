@@ -16,13 +16,14 @@
 
 void transpose() { trans(0, N); }
 
+static constexpr unsigned TRASHOLD = 4U;
 
 template<unsigned width>
 void trans_swap_static(unsigned i, unsigned j) {
-    if constexpr (width == 1) {
+    if constexpr (width == 1U) {
         swap(j, i, i, j);
     } else {
-        constexpr unsigned h_width = width / 2;
+        constexpr unsigned h_width = width / 2U;
         trans_swap_static<h_width>(i, j); // top left
         trans_swap_static<h_width>(i + h_width, j); // bottom left
         trans_swap_static<h_width>(i + h_width, j + h_width); // bottom right
@@ -32,15 +33,15 @@ void trans_swap_static(unsigned i, unsigned j) {
 
 template<unsigned width>
 void trans_static(unsigned i) {
-    if constexpr (width > 1) {
-        constexpr unsigned h_width = width / 2;
+    if constexpr (width > 1U) {
+        constexpr unsigned h_width = width / 2U;
         trans_static<h_width>(i); // top left
         trans_swap_static<h_width>(i, i + h_width); // bottom left
         trans_static<h_width>(i + h_width); // bottom right
     }
 }
 
-void pre_trans_static(unsigned i, unsigned char log) {
+void pre_trans_static(unsigned i, unsigned log) {
     switch (log) {
     case 19U:
         trans_static<1U << 19U>(i);
@@ -104,7 +105,7 @@ void pre_trans_static(unsigned i, unsigned char log) {
     }
 }
 
-void pre_trans_swap_static(unsigned i, unsigned j, unsigned char log) {
+void pre_trans_swap_static(unsigned i, unsigned j, unsigned log) {
     switch (log) {
     case 19U:
         trans_swap_static<1U << 19U>(i, j);
@@ -174,13 +175,17 @@ unsigned ulog2(unsigned fits) {
 }
 
 void trans(unsigned i, unsigned width) {
-    if (width > 1) {
-        const unsigned log = ulog2(width) - 1;
+    if (width > 1U) {
+        const unsigned log = ulog2(width) - 1U;
         const unsigned l_width = 1U << log; // also t_height
         const unsigned r_width = width - l_width; // also b_height
 
-        if (l_width == r_width) {
-            pre_trans_static(i, log + 1);
+        if (width <= TRASHOLD) {
+            for (unsigned x = 0U; x < width; ++x)
+                for (unsigned y = 0U; y < width; ++y)
+                    swap(i + x, i + y, i + y, i + x);
+        } else if (l_width == r_width) {
+            pre_trans_static(i, log + 1U);
         } else {
             pre_trans_static(i, log); // top left
             trans_swap(i + l_width, i, r_width, l_width); // bottom left
@@ -191,13 +196,18 @@ void trans(unsigned i, unsigned width) {
 
 // the trans_swapped rectangle has to have nonzero area
 void trans_swap(unsigned i, unsigned j, unsigned height, unsigned width) {
-    if (width + height == 2) { // both are 1
+    if (width + height == 2U) { // both are 1
         swap(j, i, i, j);
     } else if (width >= height) {
-        const unsigned log = ulog2(width) - 1;
+        const unsigned log = ulog2(width) - 1U;
         const unsigned l_width = 1U << log;
         const unsigned r_width = width - l_width;
-        if (l_width == height) {
+        if (height <= TRASHOLD) {
+            for (unsigned x = 0U; x < height; ++x)
+                for (unsigned y = 0U; y < width; ++y)
+                    swap(i + x, j + y, j + y, i + x);
+            return;
+        } else if (l_width == height) {
             pre_trans_swap_static(i, j, log);
         } else {
             trans_swap(j, i, l_width, height); // left half with swapped axes
