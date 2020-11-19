@@ -9,7 +9,7 @@ BEGIN {
     print "set key horizontal Left" | gnuplot
     print "set key left" | gnuplot
     print "set key reverse" | gnuplot
-    print "set pointsize .7" | gnuplot
+    print "set pointsize .85" | gnuplot
     print "set grid" | gnuplot
     logscale = -1
 
@@ -37,7 +37,7 @@ BEGIN {
         }
 
         plot = "plot \"" smart "\" title \"smart\" with linespoints pt 6"
-        plot = plot ", \"" naive "\" title \"naive\" with linespoints pt 6"
+        plot = plot ", \"" naive "\" title \"naive\" with linespoints pt 10"
 
         if ($2 == "sim") {
             m = int(substr($3,2))
@@ -89,8 +89,10 @@ BEGIN {
             print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
             plot = "plot \"" smart "\" title \"smart\" with lines"
             plot = plot ", \"" naive "\" title \"naive\" with lines"
-            plot = plot ", \"" naive "\" using (int($1) % 2048 == 1024 ? $1 : 1/0):2 title \"smart\" with points pt 6"
-            plot = plot ", \"" naive "\" using (int($1) % 2048 == 0 ? $1 : 1/0):2 title \"smart\" with points pt 6"
+            plot = plot ", \"" naive "\" using (int($1) % 1024 == 0 ? (int($1) % 2**12 == 0 ? 1/0 : $1) : 1/0):2 title \"L1 dominant\" with points pt 6"
+            plot = plot ", \"" naive "\" using (int($1) % 1024 == 512 ? $1 : 1/0):2 title \"L1 subdominant\" with points pt 8"
+            plot = plot ", \"" naive "\" using (int($1) % 2**13 == 0 ? $1 : 1/0):2 title \"L2 dominant\" with points pt 10"
+            plot = plot ", \"" naive "\" using (int($1) % 2**13 == 2**12 ? $1 : 1/0):2 title \"L2 subdominant\" with points pt 12"
 
             print plot | gnuplot
         } else {
