@@ -17,7 +17,7 @@ CXXFLAGS=-std=c++17 -O3 -Wall -Wextra -DNDEBUG -pedantic -march=native -s -Wno-s
 matrix_experiment_sim: matrix_transpose.h matrix_tests.h matrix_experiment_sim.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) matrix_experiment_sim.cpp -o $@
 
-matrix_experiment_real: matrix_transpose.h matrix_tests.h matrix_experiment_real.cpp
+matrix_experiment_real: matrix_transpose_real.h matrix_tests.h matrix_experiment_real.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) matrix_experiment_real.cpp -o $@
 
 .PHONY: clean
