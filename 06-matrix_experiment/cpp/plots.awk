@@ -5,19 +5,39 @@ BEGIN {
     gnuplot = "gnuplot"
     FS = "-"
     print "set terminal pdf size 6,4" | gnuplot
-    print "set logscale x 2" | gnuplot
-    print "set logscale y 2" | gnuplot
-    print "set yrange [2**(-10):1]" | gnuplot
-    print "set xtics 1,2" | gnuplot
     print "set key bmargin" | gnuplot
     print "set key horizontal Left" | gnuplot
     print "set key left" | gnuplot
     print "set key reverse" | gnuplot
+    print "set pointsize .7" | gnuplot
+    print "set grid" | gnuplot
+    logscale = -1
+
     while (ls | getline) {
         smart = naive = $0
         sub("naive", "smart", smart)
-        plot = "plot \"" smart "\" title \"smart\" with linespoints"
-        plot = plot ", \"" naive "\" title \"naive\" with linespoints"
+
+        if ($2 ~ /real/) {
+            print "set autoscale" | gnuplot
+        }
+
+        if ($2 ~ /128/) {
+            if (logscale != 0) {
+                print "unset logscale x" | gnuplot
+                print "set xrange [0:32768]" | gnuplot
+                print "unset logscale y" | gnuplot
+                print "set xtics 1024 rotate by -90" | gnuplot
+                logscale = 0
+            }
+        } else if (logscale != 1) {
+            print "set xtics 1,2 rotate by 0" | gnuplot
+            print "set logscale x 2" | gnuplot
+            print "set logscale y 2" | gnuplot
+            logscale = 1
+        }
+
+        plot = "plot \"" smart "\" title \"smart\" with linespoints pt 6"
+        plot = plot ", \"" naive "\" title \"naive\" with linespoints pt 6"
 
         if ($2 == "sim") {
             m = int(substr($3,2))
@@ -63,10 +83,18 @@ BEGIN {
             plot = plot ", (" upper ") title \"upper bound of non-ideal\""
 
             print plot | gnuplot
+        } else if ($2 ~ /128/) {
+            print "set output \""$2".pdf\"" | gnuplot
+            print "set ylabel \"avg. time per item (=t [ns])\"" | gnuplot
+            print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
+            plot = "plot \"" smart "\" title \"smart\" with lines"
+            plot = plot ", \"" naive "\" title \"naive\" with lines"
+            plot = plot ", \"" naive "\" using (int($1) % 2048 == 1024 ? $1 : 1/0):2 title \"smart\" with points pt 6"
+            plot = plot ", \"" naive "\" using (int($1) % 2048 == 0 ? $1 : 1/0):2 title \"smart\" with points pt 6"
+
+            print plot | gnuplot
         } else {
-            b = 64
-            print "set output \"real.pdf\"" | gnuplot
-            print "set autoscale" | gnuplot
+            print "set output \""$2".pdf\"" | gnuplot
             print "set ylabel \"avg. time per item (=t [ns])\"" | gnuplot
             print "set xlabel \"one-dimensional size of the matrix (=N)\"" | gnuplot
 
