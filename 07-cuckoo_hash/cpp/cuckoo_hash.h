@@ -121,6 +121,7 @@ public:
         }
     }
 
+    // returns UNUSED on success, or key to be reinserted
     uint32_t insert_(uint32_t key) {
         static auto log = [](uint32_t from){
             uint32_t result = 0;
@@ -135,22 +136,22 @@ public:
 
         if (table[h0] == key || table[h1] == key)
             return UNUSED;
+
         if (table[h0] == UNUSED || table[h1] == UNUSED) {
             table[(table[h0] == UNUSED) ? h0 : h1] = key;
             return UNUSED;
         }
 
-        uint32_t counter = 6 * log(num_buckets);
-        uint32_t old_hash = num_buckets;
+        std::swap(table[h0], key);
 
-        while (counter-- > 0 && key != UNUSED) {
+        uint32_t counter = 6 * log(num_buckets);
+        uint32_t old_hash = h0;
+
+        while (--counter > 0 && key != UNUSED) {
             uint32_t h = hashes[0]->hash(key);
 
             if (h == old_hash)
                 h = hashes[1]->hash(key);
-
-            if (h == old_hash)
-                return key;
 
             std::swap(table[h], key);
             old_hash = h;
