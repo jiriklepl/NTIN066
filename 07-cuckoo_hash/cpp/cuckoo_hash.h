@@ -94,7 +94,6 @@ public:
     }
 
     void rehash() {
-
         vector<uint32_t> old_table = std::move(table);
 
         for (;;) {
