@@ -2,6 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include <iostream>
+#include <utility>
 
 #include "random.h"
 
@@ -92,12 +93,79 @@ public:
         return (table[h0] == key || table[h1] == key);
     }
 
+    void rehash() {
+
+        vector<uint32_t> old_table = std::move(table);
+
+        for (;;) {
+            bool end = true;
+            table.clear();
+            table.resize(num_buckets, UNUSED);
+
+            for (int i=0; i<2; i++) {
+                delete hashes[i];
+                hashes[i] = nullptr; // just in case of an exception
+                hashes[i] = new TabulationHash(num_buckets, random_gen);
+            }
+
+            for (auto &&value : old_table) {
+                if (value != UNUSED)
+                    if (insert_(value) != UNUSED) {
+                        end = false;
+                        break;
+                    }
+            }
+
+            if (end)
+                break;
+        }
+    }
+
+    uint32_t insert_(uint32_t key) {
+        static auto log = [](uint32_t from){
+            uint32_t result = 0;
+            while (from /= 2)
+                ++result;
+
+            return result;
+        };
+
+        uint32_t h0 = hashes[0]->hash(key);
+        uint32_t h1 = hashes[1]->hash(key);
+
+        if (table[h0] == key || table[h1] == key)
+            return UNUSED;
+        if (table[h0] == UNUSED || table[h1] == UNUSED) {
+            table[(table[h0] == UNUSED) ? h0 : h1] = key;
+            return UNUSED;
+        }
+
+        uint32_t counter = 6 * log(num_buckets);
+        uint32_t old_hash = num_buckets;
+
+        while (counter-- > 0 && key != UNUSED) {
+            uint32_t h = hashes[0]->hash(key);
+
+            if (h == old_hash)
+                h = hashes[1]->hash(key);
+
+            if (h == old_hash)
+                return key;
+
+            std::swap(table[h], key);
+            old_hash = h;
+        }
+
+        return key;
+    }
+
     void insert(uint32_t key)
     {
         // Insert a new key to the table. Assumes that the key is not present yet.
         EXPECT(key != UNUSED, "Keys must differ from UNUSED.");
 
-        // TODO: Implement
+        while ((key = insert_(key)) != UNUSED)
+            rehash();
     }
 
 };
