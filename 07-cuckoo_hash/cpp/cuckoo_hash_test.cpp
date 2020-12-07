@@ -12,8 +12,8 @@ void simple_test(unsigned n, unsigned table_size_percentage)
         table.insert(37*i);
 
     for (unsigned i=0; i < n; i++) {
-        EXPECT(table.lookup(37*i), "Item not present in table, but it should be.");
-        EXPECT(!table.lookup(37*i+1), "Item present in table, even though it should not be.");
+        EXPECT(table.lookup(37*i), "Item " + std::to_string(37*i) + " not present in table, but it should be.");
+        EXPECT(!table.lookup(37*i+1), "Item " + std::to_string(37*i+1) + "present in table, even though it should not be.");
     }
 }
 
